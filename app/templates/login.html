@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Nail Manager</title>
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body class="login-page">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo" aria-hidden="true"></div>
+            <h1>Nail Manager</h1>
+            <p class="login-sub">Панель управления</p>
+            {% if error %}
+            <div class="login-error">{{ error }}</div>
+            {% endif %}
+            <form method="post" action="/admin/login" class="login-form">
+                <input type="password" name="password" placeholder="Введите пароль" required autofocus class="login-input">
+                <button type="submit" class="login-btn">Войти</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

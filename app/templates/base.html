@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}Nail Manager{% endblock %}</title>
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+    <div class="mobile-topbar">
+        <h2>{% block mobile_title %}Nail Manager{% endblock %}</h2>
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+    <div class="mobile-overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="logo">
+            <span class="logo-icon" aria-hidden="true"></span>
+            <span class="logo-text">Nail Manager</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/admin/" class="{% if request.url.path == '/admin/' or request.url.path == '/admin' %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span> Дашборд
+            </a></li>
+            <li><a href="/admin/schedule" class="{% if '/schedule' in request.url.path %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span> Расписание
+            </a></li>
+            <li><a href="/admin/bookings" class="{% if '/bookings' in request.url.path %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span> Записи
+            </a></li>
+        </ul>
+    </nav>
+
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-links">
+            <li><a href="/admin/" class="{% if request.url.path == '/admin/' or request.url.path == '/admin' %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span>Главная
+            </a></li>
+            <li><a href="/admin/schedule" class="{% if '/schedule' in request.url.path %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span>Расписание
+            </a></li>
+            <li><a href="/admin/bookings" class="{% if '/bookings' in request.url.path %}active{% endif %}">
+                <span class="nav-icon" aria-hidden="true"></span>Записи
+            </a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="topbar">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <div class="user-info">
+                <span class="master-name">Анна</span>
+                <span class="master-avatar" aria-hidden="true"></span>
+            </div>
+        </header>
+        <div class="page-body">
+            {% block body %}{% endblock %}
+        </div>
+    </main>
+
+    <script>
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('show');
+        document.getElementById('hamburger').classList.toggle('active');
+    }
+    </script>
+</body>
+</html>

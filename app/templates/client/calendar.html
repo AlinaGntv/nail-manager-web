@@ -1,0 +1,43 @@
+{% extends "client/base.html" %}
+{% block content %}
+<div class="steps">
+    <div class="step done"></div>
+    <div class="step active"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+</div>
+
+<a href="/" class="back-link">← Назад</a>
+
+<div class="client-card">
+    <h2 class="section-title">{{ service.name }}</h2>
+    <p class="section-subtitle">{{ service.desc }} · {{ service.price }}</p>
+
+    <div class="calendar-label">Выберите дату</div>
+
+    <div class="calendar-grid">
+        <div class="cal-day-name">Пн</div>
+        <div class="cal-day-name">Вт</div>
+        <div class="cal-day-name">Ср</div>
+        <div class="cal-day-name">Чт</div>
+        <div class="cal-day-name">Пт</div>
+        <div class="cal-day-name">Сб</div>
+        <div class="cal-day-name">Вс</div>
+
+        {% for d in days %}
+            {% if loop.index0 == 0 %}
+                {% for _ in range(d.weekday()) %}
+                    <div class="cal-day empty"></div>
+                {% endfor %}
+            {% endif %}
+            <button
+                type="button"
+                class="cal-day{% if d == today %} today{% endif %}"
+                onclick="window.location.href='/book/{{ service.name }}/slots?date_str={{ d.isoformat() }}'"
+            >
+                {{ d.day }}
+            </button>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

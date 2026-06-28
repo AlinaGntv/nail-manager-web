@@ -1,0 +1,25 @@
+{% extends "client/base.html" %}
+{% block content %}
+<div class="steps">
+    <div class="step active"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+</div>
+
+<div class="client-card">
+    <h2 class="section-title">Выберите услугу</h2>
+    <p class="section-subtitle">Каждая процедура выполняется лично Анной, с вниманием к деталям и комфортным временем на визит.</p>
+
+    <div class="service-grid">
+        {% for s in services %}
+        <a href="/book/{{ s.name }}" class="service-item">
+            <div class="service-icon">{{ s.icon }}</div>
+            <div class="service-name">{{ s.name }}</div>
+            <div class="service-price">{{ s.price }}</div>
+            <div class="service-desc">~{{ (s.duration / 60)|round(1) }} ч</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Записи — Nail Manager{% endblock %}
+{% block page_title %}Записи{% endblock %}
+{% block body %}
+<div class="card">
+    <div class="filter-bar">
+        <a href="/admin/bookings?status=all" class="filter-btn {% if current_status == 'all' %}active{% endif %}">Все</a>
+        <a href="/admin/bookings?status=confirmed" class="filter-btn {% if current_status == 'confirmed' %}active{% endif %}">Подтверждённые</a>
+        <a href="/admin/bookings?status=cancelled" class="filter-btn {% if current_status == 'cancelled' %}active{% endif %}">Отменённые</a>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Клиент</th>
+                <th>Телефон</th>
+                <th>Услуга</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td>{{ b.date.strftime('%d.%m.%Y') }}</td>
+                <td>{{ '%02d:%02d'|format(b.start_time.hour, b.start_time.minute) }}–{{ '%02d:%02d'|format(b.end_time.hour, b.end_time.minute) }}</td>
+                <td>{{ b.client_name }}</td>
+                <td>{{ b.client_phone }}</td>
+                <td>{{ b.service }}</td>
+                <td>
+                    <span class="status-badge {{ b.status }}">{{ b.status }}</span>
+                </td>
+                <td class="actions-cell">
+                    {% if b.status == 'confirmed' %}
+                    <form method="post" action="/admin/bookings/{{ b.id }}/status" class="action-form">
+                        <input type="hidden" name="status" value="cancelled">
+                        <button type="submit" class="btn btn-sm btn-danger">Отменить</button>
+                    </form>
+                    {% elif b.status == 'cancelled' %}
+                    <form method="post" action="/admin/bookings/{{ b.id }}/status" class="action-form">
+                        <input type="hidden" name="status" value="confirmed">
+                        <button type="submit" class="btn btn-sm btn-success">Восстановить</button>
+                    </form>
+                    {% endif %}
+                    <form method="post" action="/admin/bookings/delete/{{ b.id }}" class="action-form">
+                        <button type="submit" class="btn btn-sm btn-ghost" onclick="return confirm('Удалить запись?')">🗑</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not bookings %}
+            <tr><td colspan="7" class="empty-state">Нет записей</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

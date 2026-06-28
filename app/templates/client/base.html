@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись — Анна Мастер</title>
+    <link rel="stylesheet" href="/static/client.css">
+</head>
+<body>
+    <div class="client-shell">
+        <aside class="brand-panel">
+            <div class="brand-top">
+                <div class="brand-mark" aria-hidden="true"></div>
+                <div class="brand-kicker">Private nail studio</div>
+                <h1>Анна Мастер</h1>
+                <p>Маникюр и педикюр в Москве с аккуратной онлайн-записью, понятными слотами и спокойным сервисом.</p>
+            </div>
+
+            <div class="brand-meta">
+                <div>
+                    <span>График</span>
+                    <strong>Пн-Сб 10:00-20:00</strong>
+                </div>
+                <div>
+                    <span>Буфер</span>
+                    <strong>30 минут между визитами</strong>
+                </div>
+                <div>
+                    <span>Локация</span>
+                    <strong>Москва</strong>
+                </div>
+            </div>
+        </aside>
+
+        <main class="client-main">
+            <div class="client-wrapper">
+                <div class="client-header">
+                    <h1>Анна Мастер</h1>
+                    <p>Маникюр и педикюр в Москве</p>
+                </div>
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <div class="chat-widget">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div class="chat-header-avatar" aria-hidden="true"></div>
+                <div class="chat-header-info">
+                    <h3>Анна Мастер</h3>
+                    <p>Онлайн · Ответит за минуту</p>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-msg bot">Привет! 👋 Помогу с выбором услуги или записью. Чем могу помочь?</div>
+            </div>
+            <div class="chat-typing" id="chatTyping">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="chat-input-row">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Напишите сообщение...">
+                <button class="chat-send" id="chatSend">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+        <button class="chat-fab" id="chatFab">
+            <svg class="tg-icon" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.93 8.17l-1.93 9.07c-.15.67-.53.83-1.07.52l-2.97-2.19-1.43 1.37c-.16.16-.3.3-.61.3l.21-2.99 5.43-4.91c.24-.21-.05-.33-.37-.14L8.62 12.6l-2.87-.9c-.62-.19-.63-.62.13-.93l11.19-4.31c.52-.19.97.13.81.93z"/></svg>
+            <svg class="close-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white"/></svg>
+        </button>
+    </div>
+
+    <script>
+    const chatFab = document.getElementById('chatFab');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const chatTyping = document.getElementById('chatTyping');
+    const chatContext = [];
+
+    chatFab.addEventListener('click', () => {
+        chatWindow.classList.toggle('open');
+        chatFab.classList.toggle('active');
+        if (chatWindow.classList.contains('open')) chatInput.focus();
+    });
+
+    function addMsg(text, who) {
+        const d = document.createElement('div');
+        d.className = 'chat-msg ' + who;
+        d.textContent = text;
+        chatMessages.appendChild(d);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMsg() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        chatInput.value = '';
+        addMsg(text, 'user');
+        chatContext.push({ role: 'user', content: text });
+
+        chatTyping.classList.add('show');
+        chatSend.disabled = true;
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, context: chatContext })
+            });
+            const data = await res.json();
+            chatTyping.classList.remove('show');
+            chatSend.disabled = false;
+
+            if (data.reply) {
+                addMsg(data.reply, 'bot');
+                chatContext.push({ role: 'assistant', content: data.reply });
+            }
+        } catch {
+            chatTyping.classList.remove('show');
+            chatSend.disabled = false;
+            addMsg('Извините, произошла ошибка. Попробуйте позже.', 'bot');
+        }
+    }
+
+    chatSend.addEventListener('click', sendMsg);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+    </script>
+</body>
+</html>

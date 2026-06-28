@@ -1,0 +1,32 @@
+{% extends "client/base.html" %}
+{% block content %}
+<div class="steps">
+    <div class="step done"></div>
+    <div class="step done"></div>
+    <div class="step active"></div>
+    <div class="step"></div>
+</div>
+
+<a href="/book/{{ service.name }}" class="back-link">← Назад</a>
+
+<div class="client-card">
+    <h2 class="section-title">{{ service.name }}</h2>
+    <p class="section-subtitle">{{ target_date.strftime('%d.%m.%Y') }} · выберите время</p>
+
+    {% if slots %}
+    <div class="slots-grid">
+        {% for slot in slots %}
+        <a href="/book/{{ service.name }}/form?date_str={{ target_date.isoformat() }}&time_str={{ slot.start.strftime('%H:%M') }}" class="slot-item">
+            {{ slot.label }}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-slots">
+        <div class="no-slots-mark" aria-hidden="true">0</div>
+        <p>Свободных мест на эту дату нет</p>
+        <p>Попробуйте выбрать другой день</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

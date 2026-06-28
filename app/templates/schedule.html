@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Расписание — Nail Manager{% endblock %}
+{% block page_title %}Расписание{% endblock %}
+{% block body %}
+<div class="card">
+    <h2 class="card-title">Базовое расписание (еженедельное)</h2>
+    <form method="post" action="/admin/schedule/update" class="schedule-form">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>День</th>
+                <th>Начало</th>
+                <th>Конец</th>
+                <th>Активно</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in schedule %}
+            <tr>
+                <td class="day-label">{{ day_names[s.day_of_week] }}</td>
+                <td>
+                    <input type="hidden" name="day_of_week" value="{{ s.day_of_week }}">
+                    <input type="time" name="start" value="{{ '%02d:%02d'|format(s.start_time.hour, s.start_time.minute) }}" class="input-time">
+                </td>
+                <td>
+                    <input type="time" name="end" value="{{ '%02d:%02d'|format(s.end_time.hour, s.end_time.minute) }}" class="input-time">
+                </td>
+                <td>
+                    <label class="toggle">
+                        <input type="checkbox" name="active" value="true" {% if s.is_active %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </form>
+</div>
+
+<div class="card">
+    <h2 class="card-title">Исключения по датам</h2>
+    <form method="post" action="/admin/schedule/exception" class="exception-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Дата</label>
+                <input type="date" name="exc_date" required class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Начало</label>
+                <input type="time" name="start" class="input-time">
+            </div>
+            <div class="form-group">
+                <label>Конец</label>
+                <input type="time" name="end" class="input-time">
+            </div>
+            <div class="form-group">
+                <label>Причина</label>
+                <input type="text" name="reason" placeholder="Выходной, праздник..." class="input-field">
+            </div>
+            <div class="form-group checkbox-group">
+                <label class="toggle">
+                    <input type="checkbox" name="is_day_off" value="true">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Выходной</span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </div>
+        </div>
+    </form>
+
+    {% if exceptions %}
+    <table class="data-table table-spaced">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Тип</th>
+                <th>Причина</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d, exc in exceptions.items()|sort %}
+            <tr>
+                <td>{{ d.strftime('%d.%m.%Y') }}</td>
+                <td>
+                    {% if exc.start_time and exc.end_time %}
+                        {{ '%02d:%02d'|format(exc.start_time.hour, exc.start_time.minute) }}–{{ '%02d:%02d'|format(exc.end_time.hour, exc.end_time.minute) }}
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    {% if exc.is_day_off %}
+                        <span class="status-badge cancelled">Выходной</span>
+                    {% else %}
+                        <span class="status-badge confirmed">Индивидуальные часы</span>
+                    {% endif %}
+                </td>
+                <td>{{ exc.reason or '—' }}</td>
+                <td>
+                    <form method="post" action="/admin/schedule/exception/delete" class="action-form">
+                        <input type="hidden" name="exc_date" value="{{ d.isoformat() }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
